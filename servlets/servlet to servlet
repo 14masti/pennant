@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+
+
+<body>
+	<h1> Form for registration</h1>
+	<form action="add" method="get">
+		Enter the first number:    <input type="text" name="num1" required><br><br>
+		Enter the Second number:    <input type="text" name="num2" required><br><br>
+		<input type="submit">
+	</form>
+</body>
+</html>
+
+
+
+package com.reshu;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class AddServlet extends HttpServlet {
+
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+		int i = Integer.parseInt(req.getParameter("num1"));
+		int j = Integer.parseInt(req.getParameter("num2"));
+		int k = i + j;
+		req.setAttribute("k", k);
+		// request dispatcher
+		RequestDispatcher rd = req.getRequestDispatcher("/sq");
+		rd.forward(req, res);
+	}
+}
+
+
+
+package com.reshu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class squareServlet extends HttpServlet {
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+		int k = (int) req.getAttribute("k");
+		k = k * k;
+		PrintWriter out = res.getWriter();
+		out.println(k);
+	}
+
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+ 
+ 
+  <servlet>
+  	<servlet-name>abc</servlet-name>
+  	<servlet-class>com.reshu.AddServlet</servlet-class>
+  </servlet>
+  
+  
+  <servlet-mapping>
+  	<servlet-name>abc</servlet-name>
+  	<url-pattern>/add</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+  <servlet>
+  	<servlet-name>mno</servlet-name>
+  	<servlet-class>com.reshu.squareServlet</servlet-class>
+  </servlet>
+  
+  
+  <servlet-mapping>
+  	<servlet-name>mno</servlet-name>
+  	<url-pattern>/sq</url-pattern>
+  </servlet-mapping>
+  
+  
+</web-app>
