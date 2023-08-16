@@ -70,3 +70,7 @@ public class squareServlet extends HttpServlet {
 	}
 
 }
+
+
+
+/*****not editing the url**********************/
