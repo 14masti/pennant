@@ -1,0 +1,276 @@
+ /*let currentPage = 1;
+    const itemsPerPage = 3;
+
+
+  function displayItems(category) {
+      const contentDiv = document.getElementById('content');
+      contentDiv.innerHTML = ''; 
+
+
+      const items = data[category];
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+
+
+      
+     s for (let i = startIndex; i < endIndex; i++) {
+        const item = items[i];
+        const itemDetails = `
+          <h2>${item.name}</h2>
+          <img src="${item.image_url}" alt="${item.name}">
+          <p><strong>Description:</strong> ${item.description}</p>
+          <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+          <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+          <p><strong>Price:</strong> ${item.price}</p>
+          <button onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+          <hr>
+        `;
+        contentDiv.insertAdjacentHTML('beforeend', itemDetails);
+      }
+
+
+
+
+     const items = data[category];
+      items.forEach(item => {
+        const itemDetails = `
+          <h2>${item.name}</h2>
+          <p><strong>Description:</strong> ${item.description}</p>
+          <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+          <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+          <p><strong>Price:</strong> ${item.price}</p>
+          <img src="${item.image_url}" alt="${item.name}"><br>
+          <button class="btn info" onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+          
+          <hr>
+        `;
+      });
+//updatePagination();
+
+      
+    }*/
+
+
+const cartItems = []; // Initialize an empty array to hold cart items
+
+// Add item to cart
+// JavaScript code
+function addToCart(item) {
+    var cartItems = getCartItemsFromStorage(); // Retrieve existing cart items from localStorage
+    cartItems.push(item);  // Add the item to the cartItems array
+    saveCartItemsToStorage(cartItems); // Save updated cart items to localStorage
+    console.log("Item added to cart:", item);
+    console.log("Updated cartItems:", cartItems);
+}
+
+function saveCartItemsToStorage(items) {
+    localStorage.setItem('cart-items', JSON.stringify(items));
+}
+
+function getCartItemsFromStorage() {
+    var storedItems = localStorage.getItem('cart-items');
+    return storedItems ? JSON.parse(storedItems) : [];
+}
+// On another page, retrieve cart items from localStorage
+var cartArray = getCartItemsFromStorage();
+console.log("Retrieved cartItems:", cartArray);
+
+
+
+
+/* Remove item from cart
+function removeFromCart(index) {
+  cartItems.splice(index, 1);
+  updateCart();
+}
+*/
+// Update the cart display in the UI
+function updateCart() {
+  const cartItemsList = document.getElementById('cart-items');
+  
+  // Clear the existing list
+  cartItemsList.innerHTML = '';
+
+  // Iterate through the cart items and create list items with remove buttons
+  cartItems.forEach((item, index) => {
+    const cartItemElement = document.createElement('li');
+    cartItemElement.textContent = item.name;
+
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.onclick = () => removeFromCart(index);
+
+    cartItemElement.appendChild(removeButton);
+    cartItemsList.appendChild(cartItemElement);
+  });
+}
+
+function showCart() {
+  const cartContainer = document.getElementById('cart-container');
+  const cartItemsList = document.getElementById('cart-items');
+  
+  if (cartItems.length === 0) {
+    cartItemsList.innerHTML = '<p>Your cart is empty.</p>';
+  } else {
+    cartItemsList.innerHTML = '';
+    cartItems.forEach((item, index) => {
+      const cartItemElement = document.createElement('li');
+      cartItemElement.textContent = item.name;
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = 'Remove';
+      removeButton.onclick = () => removeFromCart(index);
+
+      cartItemElement.appendChild(removeButton);
+      cartItemsList.appendChild(cartItemElement);
+    });
+  }
+
+  cartContainer.style.display = 'block';
+}
+
+// Hide the cart container
+function hideCart() {
+  const cartContainer = document.getElementById('cart-container');
+  cartContainer.style.display = 'none';
+}
+
+// Set up the click event for the "Show Cart" button
+const showCartButton = document.getElementById('show-cart-button');
+showCartButton.addEventListener('click', showCart);
+
+// Set up the click event for the "Close" button in the cart
+const closeCartButton = document.getElementById('close-cart-button');
+closeCartButton.addEventListener('click', hideCart);
+
+
+    /*function updatePagination() {
+      const prevButton = document.querySelector('#pagination button:first-child');
+      const nextButton = document.querySelector('#pagination button:last-child');
+      const totalPages = Math.ceil(Object.values(data).flatMap(items => items.length).length / itemsPerPage);
+
+      if (currentPage === 1) {
+        prevButton.disabled = true;
+      } else {
+        prevButton.disabled = false;
+      }
+
+      if (currentPage === totalPages) {
+        nextButton.disabled = true;
+      } else {
+        nextButton.disabled = false;
+      }
+
+      document.getElementById('currentPage').textContent = currentPage;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        displayItemsForCurrentPage();
+      }
+    }*/
+
+    /*function nextPage() {
+      const totalPages = Math.ceil(Object.values(data).flatMap(items => items.length).length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayItemsForCurrentPage();
+      }
+    }
+*/
+   /* function displayItemsForCurrentPage() {
+      const categoryButtons = document.querySelectorAll('button');
+      for (let i = 0; i < categoryButtons.length; i++) {
+        if (categoryButtons[i].disabled === false) {
+          categoryButtons[i].click();
+          break;
+        }
+      }
+    }*/
+
+
+
+
+    /*function displayItems(category) {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = ''; 
+  const items = data[category];
+  items.forEach(item => {
+    const itemDetails = `
+      <h1><u>${item.name}</u></h1>
+      <p><strong>Description:</strong> ${item.description}</p>
+      <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+      <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+      <p><strong>Price:</strong> ${item.price}</p>
+      <img src="${item.image_url}" alt="${item.name}"><br>
+      <button class="btn info" onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+      <hr>
+    `;
+    contentDiv.insertAdjacentHTML('beforeend', itemDetails);
+  });
+}*/
+
+
+
+/******************pagination for the list of biryani items*****************/
+
+
+// Define variables for pagination
+const itemsPerPage = 2; // Number of items to display per page
+let currentPage = 0;    // Current page index
+
+// Function to display items for the current page
+function displayItemsForPage(itemsToDisplay) {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = '';
+
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const itemsToShow = itemsToDisplay.slice(startIndex, endIndex);
+
+  itemsToShow.forEach(item => {
+    const itemDetails = `
+      <h1><u>${item.name}</u></h1>
+      <p><strong>Description:</strong> ${item.description}</p>
+      <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+      <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+      <p><strong>Price:</strong> ${item.price}</p>
+      <img src="${item.image_url}" alt="${item.name}"><br>
+      <button class="btn info" onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+      <hr>
+    `;
+    contentDiv.insertAdjacentHTML('beforeend', itemDetails);
+  });
+
+  updatePaginationControls(itemsToDisplay.length);
+}
+
+// Function to update pagination controls
+function updatePaginationControls(totalItems) {
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  prevButton.disabled = currentPage === 0;
+  nextButton.disabled = (currentPage + 1) * itemsPerPage >= totalItems;
+}
+
+// Event listeners for pagination controls
+document.getElementById('prev-page').addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    displayItemsForPage(data.biryani_items);
+  }
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+  const totalItems = data.biryani_items.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    displayItemsForPage(data.biryani_items);
+  }
+});
+
+// Initially display items for the first page
+displayItemsForPage(data.biryani_items);
+
