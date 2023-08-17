@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <title>Ticket booking</title>
+    </head>
+    <body>
+        <center><h1><u>Ticket booking</u></h1>
+        <form action="/submit" id="dataForm">
+            Employee name: <input type="text" id="ename" name="ename" required><br><br>
+            Employee id: <input type="text" id="eid" name="eid" required><br><br>
+            JOB: <input type="text" id="job" name="job" required><br><br>
+            Department: <input type="text" id="dept" name="dept" required><br><br>
+        </form>
+
+    <select id="dropdown" name="modedrop">
+        <option value="option1">Read</option>
+        <option value="option2">Edit</option>
+        <option value="option3">Write</option>
+        
+    </select>
+
+    <button type="button">First</button>
+    <button type="button">Next</button>
+    <button type="button">Prev</button>
+    <button type="button">Last</button><br><br>
+    <button type="button" id="add">Add</button>
+    <button type="button">Edit</button>
+    <button type="button">Delete</button>
+    <button type="button">Save</button><br><br>
+    <button type="button">Search</button>
+    <button type="button">Clear</button>
+    <button type="button">Exit</button></center>
+
+
+   
+    </body>
+</html>
