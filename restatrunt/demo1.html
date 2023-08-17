@@ -146,3 +146,197 @@ document.getElementById('chocolate-button').addEventListener('click', () => {
   </script>
 </body>
 </html>
+
+
+
+
+/*****************************************************************************************************/
+
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Food Items</title>
+
+  <link href="style.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body><center>
+    <h1><u>M&G Restatrunt</u></h1>
+  <form action="/search" method="get">
+    <label for="search">Search:</label>
+    <input type="text" id="search" name="q" placeholder="Search for food">
+    <button class="btn info" id="search-button">Search</button>
+  </form>
+
+  <button class="btn info" id="biryani-button">Biryani</button>
+  <button class="btn info" id="noodles-button">Noodles</button>
+  <button class="btn info" id="juice-button">Juice</button>
+  <button class="btn info" id="chocolate-button">Chocolate</button>
+  <button class="btn info" id="show-cart-button">Show Cart</button>
+  <h1>Hello welcome to our Restatrunt</h1>
+
+
+
+<div id="pagination">
+    <button id="prev-page" class="btn info">Previous</button>
+    <button id="next-page" class="btn info">Next</button>
+  </div>
+
+</center>
+  <div id="content"></div>
+
+  <div id="cart-container">
+    <!--h2>Your Cart</h2>
+    <button id="close-cart-button" class="btn info">Close</button>
+    <ul id="cart-items">
+     
+      <li>Your cart is empty.</li>
+    </ul-->
+  </div>
+
+  
+  <script src="data.js"></script>
+  <script>
+ 
+
+
+const itemsPerPage = 2; // Number of items to display per page
+let currentPage = 0;    // Current page index
+let currentCategory = ''; // Currently selected category
+
+// Function to display items for the current page
+function displayItemsForPage(category, pageIndex) {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = '';
+
+  const startIndex = pageIndex * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const itemsToDisplay = data[category].slice(startIndex, endIndex);
+
+  itemsToDisplay.forEach(item => {
+    const itemDetails = `
+      <h1><u>${item.name}</u></h1>
+      <p><strong>Description:</strong> ${item.description}</p>
+      <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+      <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+      <p><strong>Price:</strong> ${item.price}</p>
+      <img src="${item.image_url}" alt="${item.name}"><br>
+      <button class="btn info" onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+      <hr>
+    `;
+    contentDiv.insertAdjacentHTML('beforeend', itemDetails);
+  });
+
+  updatePaginationControls(category);
+}
+
+// Function to update pagination controls
+function updatePaginationControls(category) {
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  const totalItems = data[category].length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  prevButton.disabled = currentPage === 0;
+  nextButton.disabled = (currentPage + 1) * itemsPerPage >= totalItems;
+}
+
+// Event listeners for pagination controls
+document.getElementById('prev-page').addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    displayItemsForPage(currentCategory, currentPage);
+  }
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+  const totalItems = data[currentCategory].length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    displayItemsForPage(currentCategory, currentPage);
+  }
+});
+
+// Event listeners for category buttons
+document.getElementById('biryani-button').addEventListener('click', () => {
+  currentCategory = 'biryani_items';
+  currentPage = 0;
+  displayItemsForPage(currentCategory, currentPage);
+});
+
+document.getElementById('noodles-button').addEventListener('click', () => {
+  currentCategory = 'noodle_items';
+  currentPage = 0;
+  displayItemsForPage(currentCategory, currentPage);
+});
+
+document.getElementById('juice-button').addEventListener('click', () => {
+  currentCategory = 'juice_items';
+  currentPage = 0;
+  displayItemsForPage(currentCategory, currentPage);
+});
+
+document.getElementById('chocolate-button').addEventListener('click', () => {
+  currentCategory = 'chocolate_items';
+  currentPage = 0;
+  displayItemsForPage(currentCategory, currentPage);
+});
+
+// Initially display items for the first category and page
+//document.getElementById('biryani-button').click();
+
+
+
+
+// Event listener for the search button
+document.getElementById('search-button').addEventListener('click', () => {
+  const searchTerm = document.getElementById('search').value.toLowerCase();
+
+  const foundItem = findItemByName(searchTerm);
+  if (foundItem) {
+    displaySingleItem(foundItem);
+  } else {
+    // Display a message indicating that the item was not found
+    const contentDiv = document.getElementById('content');
+    contentDiv.innerHTML = '<p>Item not found.</p>';
+  }
+});
+
+// Function to find an item by name
+function findItemByName(name) {
+  for (const category in data) {
+    const items = data[category];
+    const foundItem = items.find(item => item.name.toLowerCase() === name);
+    if (foundItem) {
+      return foundItem;
+    }
+  }
+  return null;
+}
+
+// Function to display a single item
+function displaySingleItem(item) {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = `
+    <h1><u>${item.name}</u></h1>
+    <p><strong>Description:</strong> ${item.description}</p>
+    <p><strong>Ingredients:</strong> ${item.ingredients.join(', ')}</p>
+    <p><strong>Spiciness:</strong> ${item.spiciness}</p>
+    <p><strong>Price:</strong> ${item.price}</p>
+    <img src="${item.image_url}" alt="${item.name}"><br>
+    <button class="btn info" onclick="addToCart(${JSON.stringify(item)})">Add to Cart</button>
+    <hr>
+  `;
+}
+
+
+
+
+
+
+  </script>
+</body>
+</html>
