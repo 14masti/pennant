@@ -4,100 +4,7 @@ exe.jsp------------> is the jsp file
 DALclass.java--------> is the class file
 exeserv1.java----------> is the servlet file
 employee.java-------------> its a sample file is created for the employee class
-
-
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-public class DALclass {
-    // ... other methods and attributes
-
-    public Connection getConnection() {
-        Connection conn = null;
-        try {
-            String url = "jdbc:postgresql://192.168.110.48:5432/plf_training";
-            String username = "plf_training_admin";
-            String password = "pff123";
-
-            Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(url, username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return conn;
-    }
-
-    public ArrayList<employee> fetchRecords(Connection conn, String name) {
-        ArrayList<employee> l1 = new ArrayList<>();
-        PreparedStatement preparedStatement = null;
-        ResultSet rst = null;
-
-        try {
-            String qry = "select * from resh_emp where ename=?";
-            preparedStatement = conn.prepareStatement(qry);
-            preparedStatement.setString(1, name);
-            rst = preparedStatement.executeQuery();
-
-            while (rst.next()) {
-                int empno = rst.getInt("empno");
-                String ename = rst.getString("ename");
-                String job = rst.getString("job");
-                double sal = rst.getDouble("sal");
-                employee e = new employee(empno, ename, job, sal);
-                l1.add(e);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                if (rst != null) {
-                    rst.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return l1;
-    }
-
-    public void insertEmployee(Connection conn, String empid, String employeeName, String job, String sal)
-            throws NumberFormatException, SQLException {
-        PreparedStatement preparedStatement = null;
-
-        try {
-            String query = "INSERT INTO resh_emp (empno, ename, job, sal) VALUES (?, ?, ?, ?)";
-            preparedStatement = conn.prepareStatement(query);
-            preparedStatement.setInt(1, Integer.parseInt(empid));
-            preparedStatement.setString(2, employeeName);
-            preparedStatement.setString(3, job);
-            preparedStatement.setDouble(4, Double.parseDouble(sal));
-
-            preparedStatement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-
-/*******************************************************************************/
-
-
+/******************************************************/
 package com.reshu;
 
 import java.sql.Connection;
@@ -503,3 +410,300 @@ try {
 </dependencies>
 
 </project>
+
+
+
+
+/**************************************DALclass*******************/
+package com.reshu;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class DALclass {
+	
+	String qry, cs;
+
+	public Connection getConnection() {
+        Connection conn = null;
+        try {
+            String url = "jdbc:postgresql://192.168.110.48:5432/plf_training";
+            String username = "plf_training_admin";
+            String password = "pff123";
+
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(url, username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
+	
+	
+	public ArrayList<employee> fetchRecords(Connection conn,String name)
+	{
+		ArrayList<employee> l1=new ArrayList<>();
+		PreparedStatement preparedStatement =null;
+		ResultSet rst;
+		try {
+				
+			qry = "select * from reshu_emp where ename=?";
+			
+			preparedStatement = conn.prepareStatement(qry);
+			preparedStatement.setString(1, name); 
+			rst = preparedStatement.executeQuery();
+
+			//rst = st.executeQuery(qry);
+			
+			
+			while(rst.next()) {
+				int empno = rst.getInt("empid");
+				String ename = rst.getString("ename");
+				String job = rst.getString("job");
+				double sal=rst.getDouble("sal");
+				employee e = new employee(empno, ename, job, sal);
+				l1.add(e);
+			}
+	
+			rst.close();
+			
+		}catch(Exception ex)
+	{
+			ex.printStackTrace();
+		
+		}
+		return l1;	
+	}
+	public void insertEmployee(Connection conn, String empid, String employeeName, String job, String sal) throws NumberFormatException, SQLException {
+		// TODO Auto-generated method stub
+		PreparedStatement preparedStatement =null;
+	        try {
+	            String query = "INSERT INTO reshu_emp (empid, ename, job, sal) VALUES (?, ?, ?, ?)";
+	            preparedStatement = conn.prepareStatement(query);
+	            preparedStatement.setInt(1, Integer.parseInt(empid));
+	            preparedStatement.setString(2, employeeName);
+	            preparedStatement.setString(3, job);
+	            preparedStatement.setDouble(4, Double.parseDouble(sal));
+
+	            preparedStatement.executeUpdate();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } 
+	}
+
+
+	/*public void deleteEmployee(Connection conn, String empid) throws SQLException {
+	    String query = "DELETE FROM reshu_emp WHERE empid=?";
+	    try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
+	        preparedStatement.setInt(1, Integer.parseInt(empid));
+	        preparedStatement.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}*/
+}
+
+/********************employee.java******************************/
+
+
+package com.reshu;
+
+public class employee {
+	private int empid;
+	private String ename;
+	private String job;
+	private double sal;
+	public employee(int empid, String ename, String job, double sal) {
+		// TODO Auto-generated constructor stub
+		this.ename=ename;
+		this.empid=empid;
+		this.job=job;
+		this.sal=sal;
+	}
+	public int getEmpid() {
+		return empid;
+	}
+	public void setEmpid(int empid) {
+		this.empid = empid;
+	}
+	public String getEname() {
+		return ename;
+	}
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public double getSal() {
+		return sal;
+	}
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+
+}
+
+
+/************************************exeser1.java******************************************************
+
+
+package com.reshu;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/exeser1")
+public class exeser1 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    
+    public exeser1() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		String employeeName = request.getParameter("employeeName");
+		RequestDispatcher RD = null;
+		try {
+			DALclass dal = new DALclass();
+			Connection conn = dal.getConnection(); // Get the connection
+			ArrayList<employee> al = dal.fetchRecords(conn,employeeName);
+			conn.close(); 
+			request.setAttribute("data", al);
+			RD = request.getRequestDispatcher("index.jsp");
+			RD.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//doGet(request, response);
+		String action = request.getParameter("action");
+		if (action != null && action.equals("add")) {
+		 // Handle adding new employee record
+		String employeeName = request.getParameter("employeeName");
+		String empid = request.getParameter("empid");
+		String job = request.getParameter("job");
+		String sal = request.getParameter("sal");
+
+		try {
+			DALclass dal = new DALclass();
+			Connection conn = dal.getConnection();
+		    dal.insertEmployee(conn,empid, employeeName, job, sal);
+		    conn.close();
+		    response.sendRedirect("index.jsp");
+		    } catch (Exception e) {
+		    e.printStackTrace();
+		    }
+			
+        }
+		
+		
+		/*if (action != null && action.equals("delete")) {
+	        String empidToDelete = request.getParameter("empid");
+	        try {
+	            DALclass dal = new DALclass();
+	            Connection conn = dal.getConnection();
+	            dal.deleteEmployee(conn, empidToDelete);
+	            conn.close();
+	            response.sendRedirect("exeser1"); // Redirect to refresh the page
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    } else {
+	        // Handle your existing code for fetching and displaying records
+	    }
+		    }*/
+}
+
+
+/*****************************************index.js*********************************************/
+
+
+<%@ page language="java" import="java.io.*, java.util.*, com.reshu.*" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Employee details</h1>
+<form action="exeser1" method="post">
+    Employee Name:
+    <input type="text" id="ename" name="employeeName"><br><br>
+    
+    Employee id:
+    <input type="text" id="empid" name="empid"><br><br>
+    
+    Employee job:
+    <input type="text" id="job" name="job"><br><br>
+    
+    Employee salary:
+    <input type="text" id="sal" name="sal"><br><br>
+    
+
+    <input type="submit" value="Search">
+    <input type="submit" value="ADD">
+    
+</form>
+
+ <table border="1">
+        <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Job Role</th>
+            <th>Salary</th>
+        </tr>
+        <% 
+ArrayList<employee> elist = (ArrayList<employee>) request.getAttribute("data");
+
+try {
+    if (elist != null) {
+        for (employee empObj : elist) {
+%>
+<tr>
+    <td><%= empObj.getEmpid() %></td>
+    <td><%= empObj.getEname() %></td>
+    <td><%= empObj.getJob() %></td>
+    <td><%= empObj.getSal() %></td>
+    <td><button type="button" >EDIT</button></td>
+    <td><button type="button">DELETE</button></td>
+</tr>
+<%
+        }
+    }
+} catch (Exception e) {
+    out.println("Error: " + e.getMessage());
+}
+%>
+
+          
+    </table>
+</body>
+</html>
