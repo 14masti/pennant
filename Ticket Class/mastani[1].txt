@@ -1,0 +1,306 @@
+/*********************EMEServlet.java***********************/
+
+package ishu;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/getResult")
+public class EMEServlet extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		EmpDAL e = new EmpDAL();
+		try {
+			e.conn();
+			JSONArray data = e.sele();
+			response.getWriter().println(data.toString());
+		} catch (Exception a) {
+			a.printStackTrace();
+		}
+	}
+}
+/****************Emp.java********************************/
+
+package ishu;
+
+public class Emp {
+	private int empno;
+	private String ename;
+	private int dept_no;
+	private String job;
+	private double sal;
+
+	@Override
+	public String toString() {
+		return "emp [empno=" + empno + ", ename=" + ename + ", dept_no=" + dept_no + ", job=" + job + ", sal=" + sal
+				+ "]";
+	}
+
+	public Emp(int empno, String ename, int dept_no, String job, double sal) {
+		super();
+		this.empno = empno;
+		this.ename = ename;
+		this.dept_no = dept_no;
+		this.job = job;
+		this.sal = sal;
+	}
+
+	public int getEmpno() {
+		return empno;
+	}
+
+	public void setEmpno(int empno) {
+		this.empno = empno;
+	}
+
+	public String getEname() {
+		return ename;
+	}
+
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+
+	public int getDept_no() {
+		return dept_no;
+	}
+
+	public void setDept_no(int dept_no) {
+		this.dept_no = dept_no;
+	}
+
+	public String getJob() {
+		return job;
+	}
+
+	public void setJob(String job) {
+		this.job = job;
+	}
+
+	public double getSal() {
+		return sal;
+	}
+
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+
+}
+/*******************EmpDAL.java***********************/
+
+package ishu;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class EmpDAL {
+	Connection c;
+	ResultSet r;
+
+	public void conn() throws ClassNotFoundException, SQLException {
+		Class.forName("org.postgresql.Driver");
+		c = DriverManager.getConnection("jdbc:postgresql://192.168.110.48:5432/plf_training", "plf_training_admin",
+				"pff123");
+	}
+
+	public JSONArray sele() throws SQLException, JSONException {
+		PreparedStatement s = c.prepareStatement("select * from ishwarya");
+
+		ResultSet r = s.executeQuery();
+		JSONArray j = new JSONArray();
+		while (r.next()) {
+			JSONObject o = new JSONObject();
+			o.put("id", r.getInt(1));
+			o.put("name", r.getString(2));
+			o.put("job", r.getString(3));
+			o.put("dep", r.getInt(8));
+			o.put("salary", r.getString(6));
+			j.put(o);
+		}
+		return j;
+	}
+
+	public JSONArray ad(int empno, String ename, String job, int dept, double sal) throws SQLException, JSONException {
+		PreparedStatement s = c.prepareStatement("insert into ishwarya(empno,ename,job,dept_no,sal) values(?,?,?,?,?)");
+		s.setInt(1, empno);
+		s.setString(2, ename);
+		s.setString(3, job);
+		s.setInt(4, dept);
+		s.setDouble(5, sal);
+		s.executeUpdate();
+		JSONArray r = sele();
+		return r;
+	}
+
+	public JSONArray edi(int empno, String ename, String job, int dept, double sal) throws SQLException, JSONException {
+		PreparedStatement s = c.prepareStatement("update ishwarya set ename=?,job=?,dept_no=?,sal=? where empno=?");
+		s.setInt(5, empno);
+		s.setString(1, ename);
+		s.setString(2, job);
+		s.setInt(3, dept);
+		s.setDouble(4, sal);
+		s.executeUpdate();
+		JSONArray r = sele();
+		return r;
+	}
+
+	public JSONArray del(int empno) throws SQLException, JSONException {
+		PreparedStatement s = c.prepareStatement("delete from ishwarya  where empno=?");
+		s.setInt(1, empno);
+		s.executeUpdate();
+		JSONArray r = sele();
+		return r;
+	}
+
+	public static void main(String a[]) throws ClassNotFoundException, SQLException {
+		EmpDAL e = new EmpDAL();
+		e.conn();
+		// System.out.println(e.sele());
+		// System.out.println(e.ad(1234, "ish", "software", 30, 12000));
+		System.out.println(e.edi(7902, "ish", "software", 30, 12000));
+	}
+}
+/************************addi.java***********************/
+
+package ishu;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/addi")
+public class addi extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			EmpDAL e = new EmpDAL();
+			e.conn();
+
+			int a = Integer.parseInt(request.getParameter("p1"));
+			String b = request.getParameter("p2");
+			String c = request.getParameter("p3");
+			int f = Integer.parseInt(request.getParameter("p5"));
+			double d = Double.parseDouble(request.getParameter("p4"));
+
+			System.out.println(a + " " + b + " " + c + " " + d + " " + f);
+			JSONArray v = e.ad(a, b, c, f, d);
+			System.out.println(v);
+
+			response.getWriter().write(v.toString());
+
+		} catch (Exception l) {
+			l.printStackTrace();
+		}
+
+	}
+
+}
+/*******************del.java****************/
+
+package ishu;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/del")
+public class del extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			EmpDAL e = new EmpDAL();
+			e.conn();
+			int a = Integer.parseInt(request.getParameter("p1"));
+
+			JSONArray v = e.del(a);
+			System.out.println(v);
+			response.getWriter().write(v.toString());
+		} catch (Exception l) {
+			l.printStackTrace();
+		}
+	}
+
+}
+
+/***************************editi.java*******************/
+
+
+package ishu;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/editi")
+public class editi extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			EmpDAL e = new EmpDAL();
+			e.conn();
+
+			int a = Integer.parseInt(request.getParameter("p1"));
+			String b = request.getParameter("p2");
+			String c = request.getParameter("p3");
+			int f = Integer.parseInt(request.getParameter("p5"));
+			double d = Double.parseDouble(request.getParameter("p4"));
+
+			JSONArray v = e.edi(a, b, c, f, d);
+
+			System.out.println(v);
+			response.getWriter().write(v.toString());
+		} catch (Exception l) {
+			l.printStackTrace();
+		}
+
+	}
+}
+
+/**************************************************************************/
+
+
+
