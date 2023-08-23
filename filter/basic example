@@ -1,0 +1,123 @@
+/********************index.jsp**********************/
+
+<%@ page language="java" import="java.io.*, java.util.*, com.reshu.*" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<form action="Filter_ser" >
+    Name:
+    <input type="text" id="name" name="name" required><br>
+   ID:
+    <input type="text" id="id" name="id"  required><br>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
+
+
+
+/***********************Valid_filter.java****************************/
+package com.reshu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+
+@WebFilter("/Filter_ser")
+public class Valid_filter implements Filter {
+
+    public Valid_filter() {
+        
+    }
+	public void destroy() {
+		
+	}
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		PrintWriter out=response.getWriter();
+		HttpServletRequest hs=(HttpServletRequest) request;
+		String n=request.getParameter("name");
+		int id=Integer.parseInt(request.getParameter("id"));
+		
+		
+		if(n.equals("pennant") && id==52) {
+			String key="abc";
+			HttpSession session = ((HttpServletRequest) request).getSession();
+            session.setAttribute("uniqueKey", key);
+            chain.doFilter(request, response);
+		}
+		else {
+			out.println("error occured and filter is working");
+		}
+	}
+	public void init(FilterConfig fConfig) throws ServletException {
+	
+	}
+
+}
+
+
+
+/***************************Filter_ser.java**********************/
+package com.reshu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/Filter_ser")
+public class Filter_ser extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+  
+    public Filter_ser() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        try {
+            String n = request.getParameter("name");
+            int id = Integer.parseInt(request.getParameter("id"));
+            HttpSession session = ((HttpServletRequest) request).getSession();
+            String k=(String) session.getAttribute("uniqueKey");
+            out.println("key value " + k);
+            out.println("hello your servlet is working " + n);
+
+            out.close();
+        } catch (Exception e) {
+   
+            e.printStackTrace();
+            out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
