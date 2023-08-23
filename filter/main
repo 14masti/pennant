@@ -1,0 +1,335 @@
+/****************************Valid_filter.java********************/
+
+package com.reshu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.UUID;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+
+@WebFilter("/Filter_ser")
+public class Valid_filter implements Filter {
+
+    public Valid_filter() {
+        
+    }
+	public void destroy() {
+		
+	}
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		
+		/*String n=request.getParameter("name");
+		int id=Integer.parseInt(request.getParameter("id"));
+		
+		user_valid obj=new user_valid();
+		boolean valid=obj.getConnection(n,id);
+		
+		if(valid) {
+			//String key="abc";
+			 String key = generateUniqueKey();
+			 String targetUrl = "Filter_ser"; // Replace with the URL of your filter page
+
+			 // Set the random key in the HTTP header
+			 ((HttpServletResponse) response).setHeader("MyrandKey", key);
+
+			 // Redirect to the filter page
+			 ((HttpServletResponse) response).sendRedirect(targetUrl);
+
+			HttpSession session = ((HttpServletRequest) request).getSession();
+            session.setAttribute("uniqueKey", key);
+            chain.doFilter(request, response);
+		}
+		else {
+			HttpSession session = ((HttpServletRequest) request).getSession();
+			session.setAttribute("errorMessage", "Access Denied: Please enter valid username and password.");
+            
+            // Redirect to access denied page
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            httpResponse.sendRedirect("access_denied.jsp");
+	            
+		}
+	}
+	private String generateUniqueKey() {
+		return UUID.randomUUID().toString();
+	}*/
+		PrintWriter out = response.getWriter();
+		try {
+	    
+        HttpSession session = ((HttpServletRequest) request).getSession();
+        String uk=(String) session.getAttribute("uniqueKey");
+        
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        // Get the value of the X-Random-Key header
+        String  hk= httpRequest.getHeader("MyrandKey");
+        if(uk.equals(hk)) {
+        out.println("Random Key---------> " + k);
+        out.println("Your are successfully loged in ");
+        chain.doFilter(request, response);
+        }
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+        out.println("An error occurred: " + e.getMessage());
+    }
+	}
+	public void init(FilterConfig fConfig) throws ServletException {
+	
+	}
+
+}
+/*********index.jsp********/
+<%@ page language="java" import="java.io.*, java.util.*, com.reshu.*" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Login page</title>
+<style>
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+</style>
+</head>
+<body>
+ <div id="container">
+        <h1>LOGIN PAGE</h1>                 
+<form action="Filter_ser" >
+    Name:
+    <input type="text" id="name" name="name" required><br>
+   ID:
+    <input type="text" id="id" name="id"  required><br>
+    <input type="submit" value="Submit">
+</form>
+</div>
+</body>
+</html>
+
+/*************************Filter_ser.java****************/
+
+package com.reshu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.UUID;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/Filter_ser")
+public class Filter_ser extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+  
+    public Filter_ser() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       
+        
+        
+        String n=request.getParameter("name");
+		int id=Integer.parseInt(request.getParameter("id"));
+		
+		user_valid obj=new user_valid();
+		boolean valid=obj.getConnection(n,id);
+		
+		if(valid) {
+			//String key="abc";
+			 String key = generateUniqueKey();
+			 String targetUrl = "Valid_filter"; // Replace with the URL of your filter page
+
+			 // Set the random key in the HTTP header
+			  response.setHeader("MyrandKey", key);
+
+			 // Redirect to the filter page
+			  response.sendRedirect(targetUrl);
+
+			HttpSession session = request.getSession();
+            session.setAttribute("uniqueKey", key);
+          
+		}
+		else {
+			HttpSession session = ((HttpServletRequest) request).getSession();
+			session.setAttribute("errorMessage", "Access Denied: Please enter valid username and password.");
+            
+            // Redirect to access denied page
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            httpResponse.sendRedirect("access_denied.jsp");
+	            
+		}
+    }
+	private String generateUniqueKey() {
+		return UUID.randomUUID().toString();
+	}
+        /*try {
+            String n = request.getParameter("name");
+            int id = Integer.parseInt(request.getParameter("id"));
+            HttpSession session = ((HttpServletRequest) request).getSession();
+            String k=(String) session.getAttribute("uniqueKey");
+            out.println("Random Key---------> " + k);
+            out.println("Your are successfully loged in " + n);
+
+            out.close();
+        } catch (Exception e) {
+   
+            e.printStackTrace();
+            out.println("An error occurred: " + e.getMessage());
+        }*/
+    
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+/*******************************************/
+
+<%@ page language="java" import="com.reshu.*" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Access Denied</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #ff6666;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Access Denied</h1>
+    <p><%= session.getAttribute("errorMessage") %></p>
+    </div>
+</body>
+</html>
+/*********************************************/
+package com.reshu;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class user_valid {
+	PreparedStatement preparedStatement =null;
+	String qry, cs;
+	ResultSet rst;
+	public boolean getConnection(String user, int pass) {
+        Connection conn = null;
+        try {
+        	String url = "jdbc:postgresql://192.168.110.48:5432/plf_training";
+			String username = "plf_training_admin";
+			String password = "pff123";
+            Class.forName("org.postgresql.Driver");
+            
+            conn = DriverManager.getConnection(url, username, password);
+            
+            qry = "select * from resh_login where username=? AND pass=?";
+    		preparedStatement = conn.prepareStatement(qry);
+    		preparedStatement.setString(1, user); 
+    		preparedStatement.setInt(2, pass); 
+    		rst = preparedStatement.executeQuery();
+    		return rst.next();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+}
