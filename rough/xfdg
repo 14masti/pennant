@@ -1,0 +1,239 @@
+package com.reshu_crud;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class Functionality {
+	Connection c;
+	ResultSet r;
+
+	public void conn() throws ClassNotFoundException, SQLException {
+		String url="jdbc:postgresql://localhost:5432/postgres";
+		String user="postgres";
+		String password="#Mastani14";
+
+        Class.forName("org.postgresql.Driver");
+        conn = DriverManager.getConnection(url, user, password);
+	}
+
+	public JSONArray sele() throws SQLException, JSONException {
+		PreparedStatement s = c.prepareStatement("select * from ishwarya");
+
+		ResultSet r = s.executeQuery();
+		JSONArray j = new JSONArray();
+		while (r.next()) {
+			JSONObject o = new JSONObject();
+			o.put("id", r.getInt(1));
+			o.put("name", r.getString(2));
+			o.put("job", r.getString(3));
+			o.put("dep", r.getInt(8));
+			o.put("salary", r.getString(6));
+			j.put(o);
+		}
+		return j;
+	}
+}
+	
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Employee details</h1>
+Employee Id:
+<input type="text" name="empid" id="empid"><br><br>
+Employee Name:
+<input type="text" name="ename" id="ename"><br><br>
+Employee job:
+<input type="text" name="job" id="job"><br><br>
+Employee dept:
+<input type="text" name="dept_no" id="dept_no"><br><br>
+Employee salary:
+<input type="text" name="sal" id="sal"><br><br>
+
+<button type="button" onclick="first()">first</button>
+<button type="button" onclick="next()">Next</button>
+<button type="button" onclick="previous()">Previous</button>
+<button type="button" onclick="last()">Last</button><br><br>
+     <br>
+      
+         <button type="button" onclick="add()">Add</button>
+         <button type="button" onclick="edit()">Edit</button>
+        <button type="button" onclick="deleteEntry()">Delete</button>
+        <button type="button" onclick="save()">Save</button><br><br>
+      
+      <br>
+         <button type="button" onclick="search()">Search</button>
+        <button type="button" onclick="clearFields()">Clear</button>
+        <button type="button" onclick="exit()">Exit</button>
+        
+<script>
+session_load();
+
+function session_load() {
+    var exam = new XMLHttpRequest();
+    exam.open("GET", "http://localhost:8080/CRUD_operations/Crud_ser", true);
+    exam.onreadystatechange = function () {
+    if (exam.readyState === 4) {
+        if (exam.status === 200) {
+            var j = JSON.parse(exam.responseText);
+            localStorage.setItem("local_st", JSON.stringify(j));
+            console.log("Connection is successfully established");
+        } else {
+            console.error("Request failed with status: " + exam.status);
+        }
+    }
+};
+
+}
+    
+
+var index = -1;
+function first() {
+	
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);
+    
+    index = 0;
+    document.getElementById("empid").value = jsonarray[0].id;
+    document.getElementById("ename").value = jsonarray[0].name;
+    document.getElementById("job").value = jsonarray[0].job;
+    document.getElementById("sal").value = jsonarray[0].salary;
+    document.getElementById("dept_no").value = jsonarray[0].dep;
+}
+function last() {
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);   
+    index = jsonarray.length-1;
+    document.getElementById("empno").value = jsonarray[index].id;
+    document.getElementById("name").value = jsonarray[index].name;
+    document.getElementById("job").value = jsonarray[index].job;
+    document.getElementById("salary").value = jsonarray[index].salary;
+    document.getElementById("department").value = jsonarray[index].dep;
+}
+
+
+</script>
+</body>
+</html>
+
+
+
+
+package com.reshu_crud;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/Crud_ser")
+public class Crud_ser extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    public Crud_ser() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Functionality e = new Functionality();
+		try {
+			e.conn();
+			JSONArray data = e.sele();
+			response.getWriter().println(data.toString());
+		} catch (Exception a) {
+			a.printStackTrace();
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+
+
+
+	package com.reshu_crud;
+
+public class Employee {
+	private int empid;
+	private String ename;
+	private int dept_no;
+	private String job;
+	private double sal;
+	
+	public Employee(int empid,String ename,int dept_no,String job,double sal) {
+		this.empid=empid;
+		this.ename=ename;
+		this.dept_no=dept_no;
+		this.job=job;
+		this.sal=sal;
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "emp [empno=" + empid + ", ename=" + ename + ", dept_no=" + dept_no + ", job=" + job + ", sal=" + sal
+				+ "]";
+	}
+	
+	
+	public String getEname() {
+		return ename;
+	}
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+	public int getEmpid() {
+		return empid;
+	}
+	public void setEmpid(int empid) {
+		this.empid = empid;
+	}
+	public int getDept_no() {
+		return dept_no;
+	}
+	public void setDept_no(int dept_no) {
+		this.dept_no = dept_no;
+	}
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public double getSal() {
+		return sal;
+	}
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+
+}
