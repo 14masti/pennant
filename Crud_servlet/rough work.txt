@@ -1,0 +1,333 @@
+
+/*******************Crud_ser.java********************/
+package com.reshu;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+@WebServlet("/Crud_ser")
+public class Crud_ser extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    public Crud_ser() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+    	EmpDAL e = new EmpDAL();
+		try {
+			e.getConnection();
+			JSONArray data = e.read();
+			response.getWriter().println(data.toString());
+		} catch (Exception a) {
+			a.printStackTrace();
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+/************************Crud_index.html**************/
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Employee details</h1>
+Employee Id:
+<input type="text" name="empid" id="empid"><br><br>
+Employee Name:
+<input type="text" name="ename" id="ename"><br><br>
+Employee job:
+<input type="text" name="job" id="job"><br><br>
+Employee dept:
+<input type="text" name="dept_no" id="dept_no"><br><br>
+Employee salary:
+<input type="text" name="sal" id="sal"><br><br>
+
+<button type="button" onclick="first()">First</button>
+<button type="button" onclick="next()">Next</button>
+<button type="button" onclick="prev()">Previous</button>
+<button type="button" onclick="last()">Last</button><br><br>
+     <br>
+      
+         <button type="button" onclick="add()">Add</button>
+         <button type="button" onclick="edit()">Edit</button>
+        <button type="button" onclick="deleteEntry()">Delete</button>
+        <button type="button" onclick="save()">Save</button><br><br>
+      
+      <br>
+         <button type="button" onclick="search()">Search</button>
+        <button type="button" onclick="clearform()">Clear</button>
+        <button type="button" onclick="exit()">Exit</button>
+        
+        
+<h1><center><div id="message"></div></center></h1>
+<script>
+
+
+function loadData() {
+    var exam = new XMLHttpRequest();
+    exam.open("GET", "http://localhost:8080/CRUD_project/Crud_ser", true);
+    exam.onreadystatechange = function () {
+    if (exam.readyState === 4) {
+        if (exam.status === 200) {
+            var j = JSON.parse(exam.responseText);
+            localStorage.setItem("local_st", JSON.stringify(j));
+            
+            first();
+        } else {
+            console.error("Request failed with status: " + exam.status);
+        }
+    }
+};
+exam.send();
+}
+ window.onload = function () {
+    loadData();
+};   
+
+var index = -1;
+function first() {
+	
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);
+    
+    index = 0;
+    document.getElementById("empid").value = jsonarray[0].id;
+    document.getElementById("ename").value = jsonarray[0].name;
+    document.getElementById("job").value = jsonarray[0].job;
+    document.getElementById("dept_no").value = jsonarray[0].dep;
+    document.getElementById("sal").value = jsonarray[0].salary;
+}
+
+function last() {
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);   
+    index = jsonarray.length-1;
+   
+    document.getElementById("empid").value = jsonarray[index].id;
+    document.getElementById("ename").value = jsonarray[index].name;
+    document.getElementById("job").value = jsonarray[index].job;
+    document.getElementById("dept_no").value = jsonarray[index].dep;
+    document.getElementById("sal").value = jsonarray[index].salary;
+}
+
+function next() {
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);   
+    index = index+1;
+    if(index!=jsonarray.length){
+    document.getElementById("empid").value = jsonarray[index].id;
+    document.getElementById("ename").value = jsonarray[index].name;
+    document.getElementById("job").value = jsonarray[index].job;
+    document.getElementById("dept_no").value = jsonarray[index].dep;
+    document.getElementById("sal").value = jsonarray[index].salary;
+	}else{
+		
+		document.getElementById("message").textContent = "You are at the last record.";
+		
+	}
+}
+
+function prev() {
+    var x = localStorage.getItem("local_st");
+    var jsonarray = JSON.parse(x);   
+    index = index-1;
+    if(index!=-1){
+    document.getElementById("empid").value = jsonarray[index].id;
+    document.getElementById("ename").value = jsonarray[index].name;
+    document.getElementById("job").value = jsonarray[index].job;
+    document.getElementById("dept_no").value = jsonarray[index].dep;
+    document.getElementById("sal").value = jsonarray[index].salary;
+	}else{
+	
+		document.getElementById("message").textContent = "You are at the first record.";	
+	}
+}
+
+function clearform() {
+   
+    document.getElementById("empid").value = "";
+    document.getElementById("ename").value = "";
+    document.getElementById("job").value = "";
+    document.getElementById("dept_no").value = "";
+    document.getElementById("sal").value = "";
+    document.getElementById("message").textContent = "Form is cleared";	
+}
+
+var jsonarray = []; 
+
+function search(){
+
+    var searchTerm = document.getElementById("empid").value; // Get the search term from the input field
+    var foundIndex = -1; // Initialize with an invalid index
+
+    // Iterate through the jsonarray to find the matching record
+    for (var i = 0; i < jsonarray.length; i++) {
+        if (jsonarray[i].id === searchTerm) {
+            foundIndex = i; // Record found, update the index
+            break; // Exit the loop
+        }
+    }
+    console.log(foundIndex);
+    if (foundIndex !== -1) {
+        // Record found, update the input fields
+        updateFields(jsonarray[foundIndex]);
+    } else {
+        // Record not found, display a message or take appropriate action
+        document.getElementById("message").textContent = "Record Not found";	
+    }
+}
+function updateFields(data) {
+    // Update input fields with data
+    document.getElementById("empid").value = data.id;
+    document.getElementById("name").value = data.name;
+    document.getElementById("job").value = data.job;
+    document.getElementById("dept_no").value = data.dep;
+    document.getElementById("sal").value = data.salary;
+}
+
+</script>
+</body>
+</html>
+
+
+/******************************EmpDAL.java*****************************/
+
+
+package com.reshu;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+public class EmpDAL{
+	Connection conn;
+	ResultSet rst;
+
+	String qry, cs;
+
+	public Connection getConnection() {
+        try {
+        	String url = "jdbc:postgresql://192.168.110.48:5432/plf_training";
+			String username = "plf_training_admin";
+			String password = "pff123";
+
+            Class.forName("org.postgresql.Driver");
+            conn = DriverManager.getConnection(url, username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
+	
+
+	public JSONArray read() throws SQLException, JSONException {
+		PreparedStatement pre = conn.prepareStatement("select * from resh_emp");
+
+		ResultSet rst = pre.executeQuery();
+		JSONArray j = new JSONArray();
+		while (rst.next()) {
+			JSONObject obj = new JSONObject();
+			obj.put("id", rst.getInt(1));
+			obj.put("name", rst.getString(2));
+			obj.put("job", rst.getString(3));
+			obj.put("dep", rst.getInt(8));
+			obj.put("salary", rst.getString(6));
+			j.put(obj);
+		}
+		return j;
+	}
+}
+	
+
+
+/************************Employee.java*********************/
+package com.reshu;
+
+public class Employee {
+	private int empno;
+	private String ename;
+	private int dept_no;
+	private String job;
+	private double sal;
+
+	/*@Override
+	public String toString() {
+		return "emp [empno=" + empno + ", ename=" + ename + ", dept_no=" + dept_no + ", job=" + job + ", sal=" + sal
+				+ "]";
+	}*/
+
+	public Employee(int empno, String ename, int dept_no, String job, double sal) {
+		super();
+		this.empno = empno;
+		this.ename = ename;
+		this.dept_no = dept_no;
+		this.job = job;
+		this.sal = sal;
+	}
+
+	public int getEmpno() {
+		return empno;
+	}
+
+	public void setEmpno(int empno) {
+		this.empno = empno;
+	}
+
+	public String getEname() {
+		return ename;
+	}
+
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+
+	public int getDept_no() {
+		return dept_no;
+	}
+
+	public void setDept_no(int dept_no) {
+		this.dept_no = dept_no;
+	}
+
+	public String getJob() {
+		return job;
+	}
+
+	public void setJob(String job) {
+		this.job = job;
+	}
+
+	public double getSal() {
+		return sal;
+	}
+
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+
+}
