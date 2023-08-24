@@ -302,5 +302,199 @@ public class editi extends HttpServlet {
 
 /**************************************************************************/
 
+<!DOCTYPE html>
+<html>
 
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Employee Master Entry</title>
+</head>
+
+<body>
+  <h1>Employee Master Entry</h1>
+	<select id="see">
+		<option id="read" selected>read</option>
+		<option id="add">add</option>
+		<option id="edit">edit</option>
+		<option id="save">save</option>
+	</select><br><br>
+	<table>
+
+      <tr>
+        <td><label for="empno">Employee Number </label></td>
+        <td><input type="text" id="empno" name="empno" required></td>
+      </tr>
+
+      <tr>
+        <td><label for="name">Name </label></td>
+        <td><input type="text" id="name" name="name" required></td>
+      </tr>
+
+      <tr>
+        <td><label for="job">Job:</label></td>
+        <td><input type="text" id="job" name="job" required></td>
+      </tr>
+      <tr>
+        <td><label for="salary">Salary:</label></td>
+        <td><input type="text" id="salary" name="salary" required></td>
+      </tr>
+      <tr>
+        <td><label for="department">Department:</td></label>
+        <td><input type="text" id="department" name="department" required></td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td><button id="first" onclick="first()">first</button></td>
+        <td><button type="button" onclick="next()">Next</button></td>
+        <td><button type="button" onclick="previous()">Previous</button></td>
+        <td><button type="button" onclick="last()">Last</button></td><br><br>
+      </tr>
+      <tr>
+        <td> <button type="button" onclick="add()">Add</button></td>
+        <td> <button type="button" onclick="edit()">Edit</button></td>
+        <td><button type="button" onclick="deleteEntry()">Delete</button></td>
+        <td><button type="button" onclick="save()">Save</button></td>
+      </tr>
+      <tr>
+        <td> <button type="button" onclick="search()">Search</button></td>
+        <td><button type="button" onclick="clearFields()">Clear1</button></td>
+        <td><button type="button" onclick="exit()">Exit</button></td>
+      </tr>
+    </table>
+<script>
+pref();
+function pref() {
+    var h = new XMLHttpRequest();
+    h.open("GET", "/Empajax/getResult", true);
+    h.onreadystatechange = function () {
+        if (h.status === 200 && h.readyState === 4) {
+            var j = JSON.parse(h.responseText);
+            localStorage.setItem("my", JSON.stringify(j));
+            console.log("Retrieved JSON array stored in local storage.");
+        }
+    }
+    h.send();
+}
+
+var y = -1;
+function first() {
+	
+    var x = localStorage.getItem("my");
+    var da = JSON.parse(x);
+    
+    y = 0;
+    document.getElementById("empno").value = da[0].id;
+    document.getElementById("name").value = da[0].name;
+    document.getElementById("job").value = da[0].job;
+    document.getElementById("salary").value = da[0].salary;
+    document.getElementById("department").value = da[0].dep;
+}
+function last() {
+    var x = localStorage.getItem("my");
+    var da = JSON.parse(x);   
+    y = da.length-1;
+    document.getElementById("empno").value = da[y].id;
+    document.getElementById("name").value = da[y].name;
+    document.getElementById("job").value = da[y].job;
+    document.getElementById("salary").value = da[y].salary;
+    document.getElementById("department").value = da[y].dep;
+}
+function next(){
+    var x = localStorage.getItem("my");
+    var da = JSON.parse(x);   
+    y = y+1;
+    if(y!=da.length){
+    document.getElementById("empno").value = da[y].id;
+    document.getElementById("name").value = da[y].name;
+    document.getElementById("job").value = da[y].job;
+    document.getElementById("salary").value = da[y].salary;
+    document.getElementById("department").value = da[y].dep;}
+    else{
+    	window.alert("sorry you are on last record");
+    }
+}
+function previous(){
+    var x = localStorage.getItem("my");
+    var da = JSON.parse(x);   
+    y = y-1;
+    if(y!=-1){
+    document.getElementById("empno").value = da[y].id;
+    document.getElementById("name").value = da[y].name;
+    document.getElementById("job").value = da[y].job;
+    document.getElementById("salary").value = da[y].salary;
+    document.getElementById("department").value = da[y].dep;}
+    else{
+    	window.alert("sorry you are on first record");
+    }
+}
+function clearFields() {  
+    document.getElementById("empno").value = " ";
+    document.getElementById("name").value = " ";
+    document.getElementById("job").value = " ";
+    document.getElementById("salary").value = " ";
+    document.getElementById("department").value = " ";
+}
+function add() {
+	var a = document.getElementById("see");
+	a.value = "add";
+}
+function edit() {
+	var ad = document.getElementById("see");
+	ad.value = "edit";
+}
+function save() {
+	var r = document.getElementById("see").value;
+	var a = document.getElementById("empno").value;
+	var b = document.getElementById("name").value;
+	var c = document.getElementById("job").value;
+	var d = document.getElementById("salary").value;
+	var e = document.getElementById("department").value;
+	
+	var h = new XMLHttpRequest();
+	var url;
+	if(r==="add"){
+		var url = "/Empajax/addi?p1="+a+"&p2="+b+"&p3="+c+"&p4="+d+"&p5="+e+"";
+	}
+	if(r==="edit"){
+		var url = "/Empajax/editi?p1="+a+"&p2="+b+"&p3="+c+"&p4="+d+"&p5="+e;
+	}
+    h.open("GET",url, true);
+    h.onreadystatechange = function () {
+        if (h.status === 200 && h.readyState === 4) {
+        	console.log("connection established"+ h.responseText);
+            
+        	var j = JSON.parse(h.responseText);
+            
+        	console.log(h.responseText);
+            localStorage.setItem("my", JSON.stringify(j));
+            console.log("array stored in local storage.");
+        }
+    }
+    h.send();
+}
+function deleteEntry(){
+	var a = document.getElementById("empno").value;
+    var h = new XMLHttpRequest();
+    var url = "/Empajax/del?p1="+a;
+    
+    h.open("GET", url, true);
+    h.onreadystatechange = function () {
+        if (h.status === 200 && h.readyState === 4) {
+        	console.log("connection established");
+            var j = JSON.parse(h.responseText);
+            console.log(h.responseText);
+            localStorage.setItem("my", JSON.stringify(j));
+            console.log("Retrieved JSON array stored in local storage.");
+            
+            pref();
+        }
+    }
+    h.send();
+}
+
+
+</script>
+</body>
+</html>
 
